@@ -1,0 +1,100 @@
+﻿@page "/releases/{ApplicationId:int}"
+
+<PageTitle>Releases</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+    <MudGrid Class="mb-4">
+        <MudItem xs="6">
+            <MudText Typo="Typo.h5">Mobile Apps</MudText>
+        </MudItem>
+        <MudItem xs="6" class="d-flex justify-end">
+            <AuthorizeView Roles="developer">
+                <Authorized>
+                    <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
+                        Add Release
+                    </MudButton>
+                </Authorized>
+            </AuthorizeView>
+
+        </MudItem>
+    </MudGrid>
+    <MudGrid Class="mb-4">
+        <MudItem xs="12">
+            <MudText Typo="Typo.h5">Releases</MudText>
+        </MudItem>
+    </MudGrid>
+    <MudTable Items="releases" Hover="true" Class="mb-4">
+        <HeaderContent>
+            <MudTh>Version</MudTh>
+            <MudTh>Release Date</MudTh>
+            <MudTh>Details</MudTh>
+            @if (IsDeveloper)
+            {
+                <MudTh>Delete</MudTh>
+            }
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Version">@context.Version</MudTd>
+            <MudTd DataLabel="Release Date">@context.ReleaseDate.ToShortDateString()</MudTd>
+            <MudTd DataLabel="Details">
+                <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(() => OpenDrawer(Anchor.End, context))">View</MudButton>
+            </MudTd>
+            @if (IsDeveloper)
+            {
+                <MudTd>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary"
+                                   Size="Size.Small" Class="mx-1" OnClick="@(e => OnDeleteButtonClicked(context.Id))" />
+                </MudTd>
+            }
+        </RowTemplate>
+    </MudTable>
+</MudContainer>
+
+<MudDrawer @bind-Open="_open"
+           Anchor="_anchor"
+           Elevation="1"
+           Variant="DrawerVariant.Temporary"
+           OverlayAutoClose="_overlayAutoClose"
+           Color="Color.Primary"
+           Width="420px">
+    <MudDrawerHeader>
+        <MudText Typo="Typo.h6" Align="Align.Center" Class="mt-2 mb-2" Style="width:100%;">
+            @($"Release Version - {_selectedRelease?.Version}" ?? "Release Details")
+        </MudText>
+
+    </MudDrawerHeader>
+    @if (_selectedRelease != null)
+    {
+        <MudStack Spacing="2" Class="pa-4">
+            @if (_application != null)
+            {
+                <MudText Typo="Typo.subtitle1" Align="Align.Center">
+                    <b>App Name:</b> @_application.AppName
+                </MudText>
+                <MudText Typo="Typo.subtitle2" Align="Align.Center">
+                    <b>OS:</b> @_application.OperatingSystem
+                </MudText>
+                <MudText Typo="Typo.subtitle2" Align="Align.Center">
+                    <b>Environments:</b> @_application.Environments
+                </MudText>
+                <MudDivider Class="my-2" />
+            }
+            <MudText Typo="Typo.body1" Align="Align.Center">
+                <b>Version:</b> @_selectedRelease.Version
+            </MudText>
+            <MudText Typo="Typo.body1" Align="Align.Center">
+                <b>Release Date:</b> @_selectedRelease.ReleaseDate.ToShortDateString()
+            </MudText>
+            <div class="d-flex justify-center mt-4">
+                <MudButton Color="Color.Secondary" Variant="Variant.Filled" OnClick="DownloadReleaseAsync">
+                    Download
+                </MudButton>
+            </div>
+            <div class="d-flex justify-center mt-4">
+                <MudButton OnClick="_ => _open = false" Color="Color.Info" Variant="Variant.Filled">
+                    Close Drawer
+                </MudButton>
+            </div>
+        </MudStack>
+    }
+</MudDrawer>

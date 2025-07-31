@@ -1,0 +1,27 @@
+﻿<MudDialog>
+    <TitleContent>
+        Add App
+    </TitleContent>
+    <DialogContent>
+        Dialog Content
+        <MudTextField Label="App Name" @bind-Value="appName" />
+        <MudSelect T="string" Label="Operating System" @bind-Value="operatingSystem">
+            @foreach (var os in operatingSystems)
+            {
+                <MudSelectItem Value="@os">@os</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect T="string" Label="Environment" @bind-Value="environment">
+            @foreach (var env in environments)
+            {
+                <MudSelectItem Value="@env">@env</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+

@@ -1,0 +1,41 @@
+﻿@page "/applications"
+
+@using DevAppDeploy.Models
+@using DevAppDeploy.Services.Application
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+
+<PageTitle>Applications</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
+    <MudGrid Class="mb-4">
+        <MudItem xs="6">
+            <MudText Typo="Typo.h5">Mobile Apps</MudText>
+        </MudItem>
+        <MudItem xs="6" class="d-flex justify-end">
+            <AuthorizeView Roles="developer">
+                <Authorized>
+                    <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
+                        Add App
+                    </MudButton>
+                </Authorized>
+            </AuthorizeView>
+        </MudItem>
+
+    </MudGrid>
+    <MudTable T="DisplayApplicationModel" Items="applications" Hover="true" Class="mb-4" OnRowClick="OnRowClick">
+        <HeaderContent>
+            <MudTh>App Name</MudTh>
+            <MudTh>Version</MudTh>
+            <MudTh>Environment</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="App Name">@context.AppName</MudTd>
+            <MudTd DataLabel="Version">@context.OperatingSystem</MudTd>
+            <MudTd DataLabel="Environment">@context.Environments</MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudContainer>
+
+

@@ -1,0 +1,89 @@
+﻿@page "/user-management"
+@using DevAppDeploy.Data
+@using DevAppDeploy.Services.Roles
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@attribute [Authorize(Roles = "developer")]
+@inject UserManager<ApplicationUser> UserManager
+@inject IRoleAssignmentService RoleAssignmentService
+@inject IDialogService DialogService
+
+<h3>User Management</h3>
+
+@if (users == null)
+{
+    <p>Loading users...</p>
+}
+else
+{
+    <MudTable Items="@users">
+        <HeaderContent>
+            <MudTh>Email</MudTh>
+            <MudTh>Current Roles</MudTh>
+            <MudTh>Assign Role</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Current Roles">@context.Roles.FirstOrDefault()</MudTd>
+            <MudTd>
+                <MudSelect @bind-Value="@context.SelectedRole">
+                    @foreach (var role in _roles)
+                    {
+                        <MudSelectItem Value="@role">@role</MudSelectItem>
+                    }
+                </MudSelect>
+
+            </MudTd>
+            <MudTd>
+                <MudButton Color="Color.Primary" OnClick="@(() => AssignRole(@context.Id, @context.SelectedRole))">Assign</MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+@code {
+    private List<UserViewModel>? users;
+    private readonly string[] _roles = { "developer", "tester" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await LoadUsersAsync();
+    }
+
+    private async Task<List<UserViewModel>> LoadUsersAsync()
+    {
+        var allUsers = UserManager.Users.ToList();
+        var userList = new List<UserViewModel>();
+
+        foreach (var user in allUsers)
+        {
+            var roles = await UserManager.GetRolesAsync(user);
+
+            userList.Add(new UserViewModel
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    Roles = roles.ToList()
+                });
+        }
+
+        return userList;
+    }
+
+    private async Task AssignRole(string userId, string selectedRole)
+    {
+        if (!string.IsNullOrEmpty(selectedRole))
+        {
+            await RoleAssignmentService.AssignRoleAsync(userId, selectedRole);
+            users = await LoadUsersAsync();
+        }
+    }
+
+    private class UserViewModel
+    {
+        public required string Id { get; set; }
+        public required string Email { get; set; }
+        public required List<string> Roles { get; set; }
+        public string? SelectedRole { get; set; }
+    }
+}
