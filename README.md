@@ -40,3 +40,6 @@ This final-year work-based project showcases the full software development lifec
 ## 📈 Outcome
 
 DevAppDeploy offers a viable and flexible internal distribution tool tailored to the needs of digital service teams.
+
+## 📊 Grade
+**Grade Achieved**: 🟢 **74%** 
